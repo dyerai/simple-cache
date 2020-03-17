@@ -134,6 +134,11 @@ function sc_serve_file_cache() {
 
 	header( 'Cache-Control: no-cache' ); // Check back in an hour.
 
+	// Change Content-Type.
+	if ( stripos(strrev($path), strrev('.js/index.html')) === 0 ) {
+		header( 'Content-Type: application/javascript' );
+	}
+
 	if ( ! empty( $modified_time ) && ! empty( $_SERVER['HTTP_IF_MODIFIED_SINCE'] ) && strtotime( $_SERVER['HTTP_IF_MODIFIED_SINCE'] ) === $modified_time ) {
 		if ( function_exists( 'gzencode' ) && ! empty( $GLOBALS['sc_config']['enable_gzip_compression'] ) ) {
 			header( 'Content-Encoding: gzip' );
