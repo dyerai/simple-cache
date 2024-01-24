@@ -6,6 +6,22 @@
  * @package  simple-cache
  */
 
+ /**
+ * List of the mime-types supported by Frontity. 
+ */
+const MIME_TYPES = array(
+	'js' => 'application/javascript',
+  'svg' => 'image/svg+xml',
+  'jpeg' => 'image/jpeg',
+  'jpg' => 'image/jpeg',
+  'png' => 'image/png',
+  'gif' => 'image/gif',
+  'woff' => 'application/font-woff',
+  'woff' => 'application/font-woff2',
+  'ttf' => 'application/x-font-ttf',
+  'eot' => 'application/vnd.ms-fontobject'
+);
+
 /**
  * Cache output before it goes to the browser
  *
@@ -121,6 +137,18 @@ function sc_file_cache( $buffer, $flags ) {
 		return $buffer;
 	}
 }
+/**
+ * Return the correct mime type.
+ * 
+ * @since 1.8
+ * @return string
+ */
+function sc_mime_type_header() {
+	$path_parts = pathinfo(sc_get_url_path());
+	if ( isset( $path_parts['extension'] ) ) {
+		header( 'Content-Type: ' . MIME_TYPES[$path_parts['extension']] );
+	}
+}
 
 /**
  * Get URL path for caching
@@ -170,6 +198,9 @@ function sc_serve_file_cache() {
 	}
 
 	$modified_time = (int) @filemtime( $path );
+
+	// Send header with the correct Content-Type.
+	sc_mime_type_header();
 
 	if ( ! empty( $modified_time ) && ! empty( $_SERVER['HTTP_IF_MODIFIED_SINCE'] ) && strtotime( $_SERVER['HTTP_IF_MODIFIED_SINCE'] ) === $modified_time ) {
 		if ( function_exists( 'gzencode' ) && ! empty( $GLOBALS['sc_config']['enable_gzip_compression'] ) ) {
